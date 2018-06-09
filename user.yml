@@ -1,0 +1,28 @@
+---
+- hosts: prod
+  vars:
+    # python -c 'import crypt; print crypt.crypt("ansibletest", "$1$SomeSalt")'
+    password: $1$SomeSalt$LOIkCRfiJS9wfvaw9hsWh1
+
+  tasks:
+  - name: group
+    group:
+      name: biz2
+      gid: 1561
+      state: present
+
+  - name: "user creation"
+    user:
+      name: biz
+      password: "{{ item }}"
+      shell: /bin/bash
+      uid: 1500
+      groups:
+        - biz2
+        - sudo
+      home: /home/biz
+      state: present
+    with_items: "{{ password }}"
+
+  - name: shell
+    shell: chage -d 0 biz
